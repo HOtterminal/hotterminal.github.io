@@ -16,6 +16,7 @@
             justify-content: center;
             height: 100vh;
             background-color: #ffffff;
+            text-align: center;
         }
 
         .navbar {
@@ -35,8 +36,11 @@
             height: 40px;
         }
 
+        .image-container {
+            margin-top: 60px; /* Adjust based on the height of the navbar */
+        }
+
         .error-container {
-            text-align: center;
             margin-top: 20px;
         }
 
@@ -47,7 +51,10 @@
         }
 
         .ip-address,
-        .mac-address {
+        .mac-address,
+        .system-info,
+        .operator,
+        .server-status {
             font-size: 18px;
             margin: 5px 0;
         }
@@ -57,36 +64,96 @@
             color: #666;
             margin-top: 20px;
         }
+
+        .address {
+            font-size: 16px;
+            color: red;
+            margin-top: 10px;
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
         <img src="1.png" alt="Logo">
+        <img src="1.png" alt="Logo">
+    </div>
+
+    <div class="image-container">
+        <img src="error-image.png" alt="Error Image"> <!-- Replace with your image -->
     </div>
 
     <div class="error-container">
-        <img src="1.png" alt="Logo">
         <div class="error-code">You do not have permission to access this site (Error code: 0x001017)</div>
         <div class="ip-address" id="ip-address">IP Address: Loading...</div>
         <div class="mac-address">MAC Address: Cannot be retrieved</div>
+        <div class="system-info" id="system-info">System Info: Loading...</div>
+        <div class="operator" id="operator">Operator: Loading...</div>
+        <div class="server-status" id="server-status">Server Status: Checking...</div>
     </div>
 
-    <div class="note">This IP address will be uploaded to HOT cloud for record keeping.</div>
-    <div class="error-code">Please do not disclose this website, and do not continue to visit the website, otherwise you will bear the consequences, and your operation has been uploaded to the HOT cloud terminal</div>
+    <div class="note">
+        This IP address will be uploaded to HOT cloud for record keeping.
+        <div class="address" id="address">Exact Address: Loading...</div> <!-- Placeholder for address -->
+        <div class="disclaimer">This is not your exact address. If needed, we can pinpoint it to every detail.</div>
+    </div>
 
     <script>
-        fetch('https://api.ipify.org?format=json')
+        // Fetch IP address, location, operator, and check server status
+        const ipApiUrl = 'https://ipapi.co/json/'; // Replace with your API endpoint if needed
+        const serverCheckUrl = 'https://your-server-domain.com/status'; // Replace with your server status endpoint
+
+        // Fetch IP address and location
+        fetch(ipApiUrl)
             .then(response => response.json())
             .then(data => {
+                // Set IP address
                 document.getElementById('ip-address').textContent = 'IP Address: ' + data.ip;
+
+                // Set address
+                const address = `${data.city}, ${data.region}, ${data.country_name}`;
+                document.getElementById('address').textContent = 'Exact Address: ' + address;
+
+                // Set system info
+                const systemInfo = `
+                    Browser: ${navigator.userAgent} <br>
+                    Platform: ${navigator.platform} <br>
+                    Language: ${navigator.language}
+                `;
+                document.getElementById('system-info').innerHTML = 'System Info: <br>' + systemInfo;
+
+                // Set operator information
+                document.getElementById('operator').textContent = 'Operator: ' + data.org;
             })
             .catch(error => {
-                console.error('Error fetching IP address:', error);
+                console.error('Error fetching IP address or location:', error);
                 document.getElementById('ip-address').textContent = 'IP Address: Error retrieving IP';
+                document.getElementById('address').textContent = 'Exact Address: Error retrieving address';
+                document.getElementById('system-info').innerHTML = 'System Info: Error retrieving information';
+                document.getElementById('operator').textContent = 'Operator: Error retrieving operator';
+            });
+
+        // Check server status
+        fetch(serverCheckUrl)
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('server-status').textContent = 'Server Status: Online';
+                } else {
+                    document.getElementById('server-status').textContent = 'Server Status: Offline';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking server status:', error);
+                document.getElementById('server-status').textContent = 'Server Status: Error checking status';
             });
     </script>
-    
-    <!-- This is a HOT terminal secret, please don't leak it, this is the Github center of the server located in the new translation of the West Continent in the United States, this is the last warning, if you continue to access, you will be responsible for the consequences -->
-    <!-- Server Supervisor: liuheping -->
+        <!-- This is a HOT terminal secret, please don't leak it, this is the Github center of the server located in the new translation of the West Continent in the United States, this is the last warning, if you continue to access, you will be responsible for the consequences -->
+        <!-- Server Supervisor: liuheping -->
+         <!-- The chairman said to the people who invaded the station, the chairman is Chinese: Fight with me in a small way, you are still a little tender -->
 </body>
 </html>
